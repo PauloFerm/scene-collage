@@ -89,6 +89,18 @@ window.addEventListener("keydown", (event) => {
   }
 });
 
+document.getElementById("translate").onclick = () => {
+  transformControls.setMode("translate");
+};
+
+document.getElementById("rotate").onclick = () => {
+  transformControls.setMode("rotate");
+};
+
+document.getElementById("scale").onclick = () => {
+  transformControls.setMode("scale");
+};
+
 /**
  * Model Parameters
  */

@@ -1,0 +1,42 @@
+# Blender 4.0.1 MTL File: 'PokeCenter.blend'
+# www.blender.org
+
+newmtl door_pc
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 1
+map_Kd door_pc.png
+map_d door_pc.png
+
+newmtl h_kage
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 1
+map_Kd h_kage.png
+map_d h_kage.png
+
+newmtl pc_kabe02
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 1
+map_Kd pc_kabe02.png
+map_d pc_kabe02.png
+
+newmtl pc_win1
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 1
+map_Kd pc_win1.png
+map_d pc_win1.png

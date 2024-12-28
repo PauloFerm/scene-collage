@@ -7,15 +7,6 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 
 import { LumaSplatsThree } from "@lumaai/luma-web";
 
-//import * as dat from "lil-gui";
-
-// THREE.ColorManagement.enabled = true;
-
-/**
- * GUI
- */
-//const gui = new dat.GUI();
-
 /**
  * DOM
  */
@@ -34,9 +25,9 @@ const aspectRatio = sizes.width / sizes.height;
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(50, aspectRatio, 1, 1500);
-camera.position.x = 40;
-camera.position.y = 100;
-camera.position.z = 180;
+camera.position.x = 0;
+camera.position.y = 250;
+camera.position.z = 220;
 
 const orbitControls = new OrbitControls(camera, canvas);
 orbitControls.enableDamping = true;
@@ -58,12 +49,10 @@ console.log("Splats", splat);
  */
 const ambientLight = new THREE.AmbientLight(0xffffff, 4.1);
 scene.add(ambientLight);
-//scene.fog = new THREE.Fog(0xcccccc, 500, 800);
 
 /**
  * Render and Loop
  */
-
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
@@ -86,6 +75,12 @@ window.addEventListener("keydown", (event) => {
     case "s":
       transformControls.setMode("scale");
       break;
+
+    case "c":
+      transformControls.showX = !transformControls.showX;
+      transformControls.showY = !transformControls.showY;
+      transformControls.showZ = !transformControls.showZ;
+      break;
   }
 });
 
@@ -99,6 +94,12 @@ document.getElementById("rotate").onclick = () => {
 
 document.getElementById("scale").onclick = () => {
   transformControls.setMode("scale");
+};
+
+document.getElementById("togglecontrols").onclick = () => {
+  transformControls.showX = !transformControls.showX;
+  transformControls.showY = !transformControls.showY;
+  transformControls.showZ = !transformControls.showZ;
 };
 
 /**
@@ -155,43 +156,6 @@ const mtlLoader = new MTLLoader()
         );
 
         scene.add(model);
-
-        // gui
-        //   .add(model.position, "x")
-        //   .name("Position X")
-        //   .min(-40)
-        //   .max(40)
-        //   .step(1);
-        // gui
-        //   .add(model.position, "y")
-        //   .name("Position Y")
-        //   .min(-40)
-        //   .max(40)
-        //   .step(1);
-        // gui
-        //   .add(model.position, "z")
-        //   .name("Position Z")
-        //   .min(-40)
-        //   .max(40)
-        //   .step(1);
-
-        // const setRotationGUI = (axis, name, vector) => {
-        //   gui
-        //     .add(parameters.rotation, axis)
-        //     .name(name)
-        //     .min(-Math.PI)
-        //     .max(Math.PI)
-        //     .step(0.005)
-        //     .onChange((value) => {
-        //       model.setRotationFromAxisAngle(vector, value);
-        //     });
-        // };
-
-        // setRotationGUI("y", "Rotation", new THREE.Vector3(0, 1, 0));
-
-        // gui.add(model.scale, "x").name("Scale X").min(-0.1).max(1).step(0.01);
-        // gui.add(model.scale, "y").name("Scale Y").min(-0.1).max(1).step(0.01);
-        // gui.add(model.scale, "z").name("Scale Z").min(-0.1).max(1).step(0.01);
 
         console.log(model);
 

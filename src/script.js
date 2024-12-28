@@ -160,6 +160,9 @@ const mtlLoader = new MTLLoader()
         console.log(model);
 
         transformControls.attach(model);
+        transformControls.showX = false;
+        transformControls.showY = false;
+        transformControls.showZ = false;
         scene.add(transformControls);
       });
   });

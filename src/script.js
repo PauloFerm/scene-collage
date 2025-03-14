@@ -33,18 +33,6 @@ const orbitControls = new OrbitControls(camera, canvas);
 orbitControls.enableDamping = true;
 
 /**
- * Import Gaussian Splat Scene
- */
-const splat = new LumaSplatsThree({
-  source: "https://lumalabs.ai/capture/b318ae30-21fc-42f3-9561-4851ea7da8f9",
-});
-
-splat.rotateY(-Math.PI * 0.5);
-splat.scale.set(100, 100, 100);
-scene.add(splat);
-console.log("Splats", splat);
-
-/**
  * Import Custom Model
  */
 const ambientLight = new THREE.AmbientLight(0xffffff, 4.1);
@@ -103,29 +91,44 @@ document.getElementById("togglecontrols").onclick = () => {
 };
 
 /**
+ * Import Gaussian Splat Scene
+ */
+const splat = new LumaSplatsThree({
+  source: "https://lumalabs.ai/capture/6c34f997-cd59-43fc-9322-8edc5a845e32",
+});
+
+splat.rotateX(Math.PI * 0.15);
+splat.rotateY(Math.PI * 0.3);
+splat.scale.set(100, 100, 100);
+scene.add(splat);
+console.log("Splats", splat);
+
+transformControls.attach(splat);
+/**
  * Model Parameters
  */
 const parameters = {
+  name: "onco_low",
   rotation: {
     x: 0,
-    y: Math.PI * 0.2,
+    y: 0,
     z: 0,
   },
   scale: {
-    x: 0.7,
-    y: 0.55,
-    z: 0.7,
+    x: 1,
+    y: 1,
+    z: 1,
   },
   position: {
-    x: -10,
-    y: 25,
-    z: -30,
+    x: 0,
+    y: 100,
+    z: 100,
   },
 };
 
 const mtlLoader = new MTLLoader()
   .setPath("/models/")
-  .load("PokeCenter.mtl", (materials) => {
+  .load(`${parameters.name}.mtl`, (materials) => {
     materials.preload();
 
     for (let materialName in materials.materials) {
@@ -138,7 +141,7 @@ const mtlLoader = new MTLLoader()
     const loader = new OBJLoader()
       .setMaterials(materials)
       .setPath("/models/")
-      .load("PokeCenter.obj", (model) => {
+      .load(`${parameters.name}.obj`, (model) => {
         //model.rotateY(Math.PI * 0.2);
         model.setRotationFromAxisAngle(
           new THREE.Vector3(0, 1, 0),
@@ -157,13 +160,11 @@ const mtlLoader = new MTLLoader()
 
         scene.add(model);
 
-        console.log(model);
-
         transformControls.attach(model);
         transformControls.showX = false;
         transformControls.showY = false;
         transformControls.showZ = false;
-        scene.add(transformControls);
+        //scene.add(transformControls);
       });
   });
 

@@ -10,7 +10,7 @@
     "vite-plugin-restart": "^0.4.1"
   },
   "dependencies": {
-    "three": "^0.166.1",
+    "three": "^0.157.0",
     "lil-gui": "^0.19.2",
     "@lumaai/luma-web": "^0.2.2"
   }

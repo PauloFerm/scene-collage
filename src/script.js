@@ -50,6 +50,22 @@ transformControls.addEventListener("dragging-changed", (event) => {
   orbitControls.enabled = !event.value;
 });
 
+const toggleControls = () => {
+  let newStatus = !transformControls.showX;
+  transformControls.showX = newStatus;
+  transformControls.showY = newStatus;
+  transformControls.showZ = newStatus;
+
+  const toggleDisplay = (id, status) => {
+    document.getElementById(id).style.display = status ? "block" : "none";
+  };
+
+  toggleDisplay("logPosition", newStatus);
+  toggleDisplay("logRotation", newStatus);
+  toggleDisplay("logScale", newStatus);
+  toggleDisplay("foot", newStatus);
+};
+
 window.addEventListener("keydown", (event) => {
   switch (event.key) {
     case "t":
@@ -65,9 +81,7 @@ window.addEventListener("keydown", (event) => {
       break;
 
     case "c":
-      transformControls.showX = !transformControls.showX;
-      transformControls.showY = !transformControls.showY;
-      transformControls.showZ = !transformControls.showZ;
+      toggleControls();
       break;
   }
 });
@@ -84,87 +98,99 @@ document.getElementById("scale").onclick = () => {
   transformControls.setMode("scale");
 };
 
-document.getElementById("togglecontrols").onclick = () => {
-  transformControls.showX = !transformControls.showX;
-  transformControls.showY = !transformControls.showY;
-  transformControls.showZ = !transformControls.showZ;
-};
+document.getElementById("togglecontrols").onclick = toggleControls;
 
-/**
- * Import Gaussian Splat Scene
- */
-const splat = new LumaSplatsThree({
-  source: "https://lumalabs.ai/capture/6c34f997-cd59-43fc-9322-8edc5a845e32",
-});
+const collageUrl = "/models/onco_low.json";
 
-splat.rotateX(Math.PI * 0.15);
-splat.rotateY(Math.PI * 0.3);
-splat.scale.set(100, 100, 100);
-scene.add(splat);
-console.log("Splats", splat);
+fetch(collageUrl)
+  .then((response) => response.json())
+  .then((modelState) => {
+    /**
+     * Import Gaussian Splat Scene
+     */
+    const splat = new LumaSplatsThree({
+      source: `https://lumalabs.ai/capture/${modelState.splat.url}`,
+    });
 
-transformControls.attach(splat);
-/**
- * Model Parameters
- */
-const parameters = {
-  name: "onco_low",
-  rotation: {
-    x: 0,
-    y: 0,
-    z: 0,
-  },
-  scale: {
-    x: 1,
-    y: 1,
-    z: 1,
-  },
-  position: {
-    x: 0,
-    y: 100,
-    z: 100,
-  },
-};
+    splat.rotateX(modelState.splat.rotation.x);
+    splat.rotateY(modelState.splat.rotation.y);
+    splat.rotateZ(modelState.splat.rotation.z);
 
-const mtlLoader = new MTLLoader()
-  .setPath("/models/")
-  .load(`${parameters.name}.mtl`, (materials) => {
-    materials.preload();
+    splat.scale.set(
+      modelState.splat.scale.x,
+      modelState.splat.scale.y,
+      modelState.splat.scale.z
+    );
+    scene.add(splat);
 
-    for (let materialName in materials.materials) {
-      let material = materials.materials[materialName];
-      material.transparent = false;
-    }
+    //    console.log("Model State", modelState);
 
-    console.log("Materials", materials.materials);
-
-    const loader = new OBJLoader()
-      .setMaterials(materials)
+    const mtlLoader = new MTLLoader()
       .setPath("/models/")
-      .load(`${parameters.name}.obj`, (model) => {
-        //model.rotateY(Math.PI * 0.2);
-        model.setRotationFromAxisAngle(
-          new THREE.Vector3(0, 1, 0),
-          parameters.rotation.y
-        );
+      .load(`${modelState.name}.mtl`, (materials) => {
+        materials.preload();
 
-        model.position.x = parameters.position.x;
-        model.position.y = parameters.position.y;
-        model.position.z = parameters.position.z;
+        for (let materialName in materials.materials) {
+          let material = materials.materials[materialName];
+          material.transparent = false;
+        }
 
-        model.scale.set(
-          parameters.scale.x,
-          parameters.scale.y,
-          parameters.scale.z
-        );
+        //console.log("Materials", materials.materials);
 
-        scene.add(model);
+        const loader = new OBJLoader()
+          .setMaterials(materials)
+          .setPath("/models/")
+          .load(`${modelState.name}.obj`, (modelObject) => {
+            /**
+             * Rotate model on world axis
+             */
+            modelObject.rotateOnAxis(
+              new THREE.Vector3(1, 0, 0),
+              modelState.cad.rotation.x
+            );
 
-        transformControls.attach(model);
-        transformControls.showX = false;
-        transformControls.showY = false;
-        transformControls.showZ = false;
-        //scene.add(transformControls);
+            modelObject.rotateOnAxis(
+              new THREE.Vector3(0, 1, 0),
+              modelState.cad.rotation.y
+            );
+
+            modelObject.rotateOnAxis(
+              new THREE.Vector3(0, 0, 1),
+              modelState.cad.rotation.z
+            );
+
+            /**
+             * Position model on world axis
+             */
+            modelObject.position.x = modelState.cad.position.x;
+            modelObject.position.y = modelState.cad.position.y;
+            modelObject.position.z = modelState.cad.position.z;
+
+            /**
+             * Scale model
+             */
+            modelObject.scale.set(
+              modelState.cad.scale.x,
+              modelState.cad.scale.y,
+              modelState.cad.scale.z
+            );
+
+            /**
+             * Add model to scene
+             */
+            scene.add(modelObject);
+
+            /**
+             * Attach transform controls to model
+             */
+            transformControls.attach(modelObject);
+            transformControls.showX = false;
+            transformControls.showY = false;
+            transformControls.showZ = false;
+            scene.add(transformControls);
+          });
+
+        console.log("Scene:", scene.children);
       });
   });
 
@@ -187,8 +213,54 @@ const render = () => {
   renderer.setSize(sizes.width, sizes.height, true);
 };
 
+/**
+ * Calculate angles between world axis and model
+ * @param {THREE.Object3D} model - The 3D model to calculate angles for
+ * @returns {Object} Object containing angles in degrees for each axis
+ */
+const calculateModelAngles = (model) => {
+  // Get the model's rotation matrix
+  const rotationMatrix = new THREE.Matrix4();
+  model.updateMatrix();
+  rotationMatrix.extractRotation(model.matrix);
+
+  // Convert rotation matrix to Euler angles
+  const euler = new THREE.Euler();
+  euler.setFromRotationMatrix(rotationMatrix);
+
+  return euler;
+};
+
+const updateModelState = () => {
+  let model = scene.children[2];
+  let modelAngles = calculateModelAngles(model);
+
+  const updateText = (id, tag, value) => {
+    document.getElementById(id).innerHTML = `${tag}: ${value.toFixed(2)}`;
+  };
+
+  updateText("rotationX", "X", modelAngles.x);
+  updateText("rotationY", "Y", modelAngles.y);
+  updateText("rotationZ", "Z", modelAngles.z);
+
+  updateText("positionX", "X", model.position.x);
+  updateText("positionY", "Y", model.position.y);
+  updateText("positionZ", "Z", model.position.z);
+
+  updateText("scaleX", "X", model.scale.x);
+  updateText("scaleY", "Y", model.scale.y);
+  updateText("scaleZ", "Z", model.scale.z);
+};
+
+const reportFrame = 50;
+let frameCount = 1;
+
 const loop = () => {
   render();
+  if (frameCount % reportFrame === 0) {
+    updateModelState();
+  }
+  frameCount++;
   window.requestAnimationFrame(loop);
 };
 

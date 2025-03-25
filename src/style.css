@@ -45,11 +45,34 @@ body
     color: #ccc;
 }
 
+.controls
+{
+    color: #ccc;
+    display: none;
+}
+
+#logPosition
+{
+    right: 10px;
+    top: 10px;
+}
+
+#logRotation
+{
+    right: 10px;
+    top: 100px;
+}
+
+#logScale
+{
+    right: 10px;
+    top: 190px;
+}
+
 #foot
 {
     right: 10px;
     bottom: 10px;
-    color: #ccc;
 }
 
 .bold

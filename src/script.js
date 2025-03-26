@@ -25,9 +25,7 @@ const aspectRatio = sizes.width / sizes.height;
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(50, aspectRatio, 1, 1500);
-camera.position.x = 0;
-camera.position.y = 250;
-camera.position.z = 220;
+
 
 const orbitControls = new OrbitControls(camera, canvas);
 orbitControls.enableDamping = true;
@@ -100,11 +98,18 @@ document.getElementById("scale").onclick = () => {
 
 document.getElementById("togglecontrols").onclick = toggleControls;
 
-const collageUrl = "/models/onco_low.json";
+const collageUrl = "/models/PokeCenter.json";
 
 fetch(collageUrl)
   .then((response) => response.json())
   .then((modelState) => {
+    document.getElementById("title").innerHTML = modelState.title;
+    document.getElementById("heading").innerHTML = modelState.heading;
+
+    camera.position.x = modelState.camera.position.x;
+    camera.position.y = modelState.camera.position.y;
+    camera.position.z = modelState.camera.position.z;
+
     /**
      * Import Gaussian Splat Scene
      */
@@ -127,7 +132,7 @@ fetch(collageUrl)
 
     const mtlLoader = new MTLLoader()
       .setPath("/models/")
-      .load(`${modelState.name}.mtl`, (materials) => {
+      .load(`${modelState.modelName}.mtl`, (materials) => {
         materials.preload();
 
         for (let materialName in materials.materials) {
@@ -140,7 +145,7 @@ fetch(collageUrl)
         const loader = new OBJLoader()
           .setMaterials(materials)
           .setPath("/models/")
-          .load(`${modelState.name}.obj`, (modelObject) => {
+          .load(`${modelState.modelName}.obj`, (modelObject) => {
             /**
              * Rotate model on world axis
              */
